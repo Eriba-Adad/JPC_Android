@@ -148,7 +148,9 @@ public abstract class Bios extends AbstractHardwareComponent {
     }
 
     private static final byte[] getBiosData(String image) throws IOException {
-        InputStream in = Bios.class.getResourceAsStream(image);
+        InputStream in = java.nio.file.Path()
+
+                Bios.class.getResourceAsStream(image);
         if (in == null) {
             throw new IOException("resource not found: " + image);
         }

@@ -60,6 +60,7 @@ import java.util.logging.*;
 import java.util.zip.*;
 import org.jpc.emulator.execution.codeblock.CodeBlockManager;
 import org.jpc.j2se.VirtualClock;
+import java.nio.file.*;
 
 import javax.swing.*;
 
@@ -69,9 +70,10 @@ import javax.swing.*;
  */
 public class PC {
 
+    public final static String HOME = System.getProperty("user.dir");
     public static int SYS_RAM_SIZE;
     public static final int DEFAULT_RAM_SIZE = Option.ram.intValue(16) * 1024 * 1024;
-    public static final int INSTRUCTIONS_BETWEEN_INTERRUPTS = 1; 
+    public static final int INSTRUCTIONS_BETWEEN_INTERRUPTS = 1;
     public static final boolean ETHERNET = Option.ethernet.isSet();
 
     public static volatile boolean compile = Option.compile.isSet();
@@ -174,8 +176,18 @@ public class PC {
             parts.add(new EthernetCard());
 
         //BIOSes
-        parts.add(new SystemBIOS(Option.bios.value("/resources/bios/bios.bin")));
-        parts.add(new VGABIOS("/resources/bios/vgabios.bin"));
+
+        java.nio.file.Path p = Paths.get(HOME+"\\bios.bin");
+        if (Files.exists(p) == false) {
+            System.out.println(p.toString() + "doesn't exist!");
+        }
+        java.nio.file.Path v = Paths.get(HOME+"\\vgabios.bin");
+        if (Files.exists(v) == false) {
+            System.out.println(v.toString() + "doesn't exist!");
+        }
+
+        parts.add(new SystemBIOS(p.toString()));
+        parts.add(new VGABIOS(v.toString()));
 
         if (Option.sound.value())
         {
@@ -1210,7 +1222,8 @@ public class PC {
                 pc.getProcessor().printState();
             }
         } catch (IOException e) {
-            System.err.println("IOError starting PC");
+            System.err.println("IOError starting PC\n" + e.getMessage());
+
         }
     }
 }
